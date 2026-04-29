@@ -1,0 +1,55 @@
+[package]
+name = "rustify"
+version = "0.1.0"
+edition = "2021"
+description = "The Rust-based Spotify client that set the music free."
+license = "GPL-3.0"
+authors = ["AsHfIEXE"]
+repository = "https://github.com/AsHfIEXE/rustify"
+
+[dependencies]
+# GUI Framework — Elm-architecture, retained mode, 60fps native UI
+iced = { version = "0.14", features = ["tokio", "image", "svg"] }
+
+# Async Runtime
+tokio = { version = "1", features = ["full"] }
+
+# Spotify Web API — OAuth PKCE + full endpoint coverage
+rspotify = { version = "0.16", features = ["cli", "client-reqwest"] }
+
+# Audio Playback — High-level audio output with symphonia decoder backend
+rodio = { version = "0.22", features = ["symphonia-all"] }
+
+# HTTP Client — Fetching stream URLs from Piped/YouTube
+reqwest = { version = "0.12", features = ["json", "stream"] }
+
+# Local Database — Cache playlists, settings, resolved URLs
+rusqlite = { version = "0.31", features = ["bundled"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Secure Token Storage — Windows Credential Manager
+keyring = { version = "3", features = ["windows-native"] }
+
+# Plugin Runtime — WASM sandbox for user extensions
+wasmtime = "44"
+
+# Utilities
+thiserror = "2"
+anyhow = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+url = "2"
+dirs = "6"
+open = "5"
+chrono = { version = "0.4", features = ["serde"] }
+futures = "0.3"
+bytes = "1"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
