@@ -31,20 +31,39 @@ impl SpotifyClient {
                 "user-read-playback-state",
                 "user-library-read",
                 "playlist-read-private",
-                "playlist-read-collaborative"
+                "playlist-read-collaborative",
+                "playlist-modify-private",
+                "playlist-modify-public"
             ),
             ..Default::default()
         };
-        Self { client: AuthCodePkceSpotify::new(creds, oauth) }
+        let mut config = rspotify::Config::default();
+        config.token_cached = true;
+        config.token_refreshing = true;
+        Self { client: AuthCodePkceSpotify::with_config(creds, oauth, config) }
     }
 
     /// Start OAuth PKCE flow — opens browser, catches callback.
     pub async fn authenticate(&mut self) -> Result<(), SpotifyError> {
-        let url = self.client.get_authorize_url(None)
-            .map_err(|e| SpotifyError::AuthError(e.to_string()))?;
-        let _ = open::that(&url);
-        self.client.prompt_for_token(&url).await
-            .map_err(|e| SpotifyError::AuthError(e.to_string()))?;
+        let token = self.client.read_token_cache(true).await.unwrap_or(None);
+        if let Some(tok) = token {
+            *self.client.get_token().lock().await.unwrap() = Some(tok);
+        } else {
+            let url = self.client.get_authorize_url(None)
+                .map_err(|e| SpotifyError::AuthError(e.to_string()))?;
+            let _ = open::that(&url);
+            self.client.prompt_for_token(&url).await
+                .map_err(|e| SpotifyError::AuthError(e.to_string()))?;
+        }
+        Ok(())
+    }
+
+    /// Create a new playlist for the current user.
+    pub async fn create_playlist(&self, name: &str) -> Result<(), SpotifyError> {
+        let me = self.client.current_user().await
+            .map_err(|e| SpotifyError::ApiError(e.to_string()))?;
+        self.client.user_playlist_create(me.id, name, Some(false), Some(false), None).await
+            .map_err(|e| SpotifyError::ApiError(e.to_string()))?;
         Ok(())
     }
 

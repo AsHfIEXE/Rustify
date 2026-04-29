@@ -54,7 +54,7 @@ impl Default for AppConfig {
     fn default() -> Self {
         Self {
             spotify_client_id: String::new(),
-            spotify_redirect_uri: "http://localhost:8888/callback".to_string(),
+            spotify_redirect_uri: "https://localhost:8888/callback".to_string(),
             piped_instance: "https://pipedapi.kavin.rocks".to_string(),
             audio_quality: AudioQuality::High,
             theme: ThemePreference::Dark,

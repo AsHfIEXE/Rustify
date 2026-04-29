@@ -47,7 +47,7 @@
 2. **Create a `.env` file** (or set environment variables):
    ```env
    RSPOTIFY_CLIENT_ID=your_spotify_client_id
-   RSPOTIFY_REDIRECT_URI=http://localhost:8888/callback
+   RSPOTIFY_REDIRECT_URI=https://localhost:8888/callback
    ```
 
 3. **Build & Run:**
